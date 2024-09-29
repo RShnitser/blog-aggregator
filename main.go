@@ -3,6 +3,7 @@ package main
 import(
 	"blog-aggregator/internal/config"
 	"fmt"
+	"os"
 )
 
 func main(){
@@ -11,12 +12,26 @@ func main(){
 		fmt.Printf("Error reading config: %v", err)
 		return;
 	}
-	fmt.Println(cfg)
 	
-	err = cfg.SetUser("test")
-	if err != nil{
-		fmt.Printf("Error writing to config: %v", err)
-		return;
+	s := state{&cfg}
+	commands := commands{
+		make(map[string]func(*state, command) error),
 	}
-	fmt.Println(cfg)
+	commands.register("login", handlerLogin)
+
+	args := os.Args[1:]
+	if len(args) == 0{
+		fmt.Println("no command provided")
+		return
+	}
+
+	command := command{
+		args[0],
+		args[1:],
+	}
+
+	err = commands.run(&s, command)
+	if err != nil{
+		fmt.Printf("could not execute command: %s\n", err)
+	}
 }
