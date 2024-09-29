@@ -10,7 +10,7 @@ func main(){
 	cfg, err := config.Read()
 	if err != nil{
 		fmt.Printf("Error reading config: %v", err)
-		return;
+		os.Exit(1)
 	}
 	
 	s := state{&cfg}
@@ -22,7 +22,7 @@ func main(){
 	args := os.Args[1:]
 	if len(args) == 0{
 		fmt.Println("no command provided")
-		return
+		os.Exit(1)
 	}
 
 	command := command{
@@ -33,5 +33,6 @@ func main(){
 	err = commands.run(&s, command)
 	if err != nil{
 		fmt.Printf("could not execute command: %s\n", err)
+		os.Exit(1)
 	}
 }
