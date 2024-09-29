@@ -6,9 +6,17 @@ import(
 )
 
 func main(){
-	cfg,_ := config.Read()
-	name := "test"
+	cfg, err := config.Read()
+	if err != nil{
+		fmt.Printf("Error reading config: %v", err)
+		return;
+	}
 	fmt.Println(cfg)
-	cfg.SetUser(&name)
+	
+	err = cfg.SetUser("test")
+	if err != nil{
+		fmt.Printf("Error writing to config: %v", err)
+		return;
+	}
 	fmt.Println(cfg)
 }
