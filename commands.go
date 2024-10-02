@@ -1,11 +1,13 @@
 package main
 
 import(
+	"blog-aggregator/internal/database"
 	"blog-aggregator/internal/config"
 	"fmt"
 )
 
 type state struct{
+	db  *database.Queries
 	cfg *config.Config
 }
 

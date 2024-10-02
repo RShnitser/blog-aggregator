@@ -1,9 +1,12 @@
 package main
 
 import(
+	"blog-aggregator/internal/database"
+	"database/sql"
 	"blog-aggregator/internal/config"
 	"fmt"
 	"os"
+	_ "github.com/lib/pq"
 )
 
 func main(){
@@ -12,8 +15,14 @@ func main(){
 		fmt.Printf("Error reading config: %v", err)
 		os.Exit(1)
 	}
+
+	db, err := sql.Open("postgres", cfg.DbURL)
+	if err != nil{
+		fmt.Printf("Error creating database: %v", err)
+		os.Exit(1)
+	}
 	
-	s := state{&cfg}
+	s := state{database.New(db), &cfg}
 	commands := commands{
 		make(map[string]func(*state, command) error),
 	}
