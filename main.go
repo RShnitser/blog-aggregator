@@ -27,6 +27,7 @@ func main(){
 		make(map[string]func(*state, command) error),
 	}
 	commands.register("login", handlerLogin)
+	commands.register("register", handlerRegister)
 
 	args := os.Args[1:]
 	if len(args) == 0{
