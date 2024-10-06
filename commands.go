@@ -59,12 +59,22 @@ func handlerRegister(s *state, cmd command) error{
 		return fmt.Errorf("username required")
 	}
 
-	_, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
+	user, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
 		ID: uuid.New(),
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Name: cmd.args[0],
 	})
+	if err != nil{
+		return err
+	}
+
+	fmt.Printf("created user with name %s\n", user.Name)
+
+	err = s.cfg.SetUser(user.Name)
+	if err != nil{
+		return err
+	}
 
 	return err
 }
