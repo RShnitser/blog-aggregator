@@ -4,6 +4,9 @@ import(
 	"blog-aggregator/internal/database"
 	"blog-aggregator/internal/config"
 	"fmt"
+	"github.com/google/uuid"
+	"time"
+	"context"
 )
 
 type state struct{
@@ -43,5 +46,24 @@ func handlerLogin(s *state, cmd command) error{
 	}
 
 	fmt.Printf("user name set to %s\n", cmd.args[0])
+	return nil
+}
+
+func handlerRegister(s *state, cmd command) error{
+	if len(cmd.args) == 0{
+		return fmt.Errorf("username required")
+	}
+
+	_, err := s.db.CreateUser(context.Background(), database.CreateUserParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		Name: cmd.args[0],
+	})
+
+	if err != nil{
+		return err
+	}
+
 	return nil
 }
