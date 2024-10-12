@@ -29,6 +29,7 @@ func main(){
 	commands.register("login", handlerLogin)
 	commands.register("register", handlerRegister)
 	commands.register("reset", handleResetDatabase)
+	commands.register("users", handleListUsers)
 
 	args := os.Args[1:]
 	if len(args) == 0{

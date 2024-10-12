@@ -7,6 +7,9 @@ import(
 	"github.com/google/uuid"
 	"time"
 	"context"
+	"net/http"
+	"io"
+	"encoding/xml"
 )
 
 type state struct{
@@ -86,4 +89,67 @@ func handleResetDatabase(s *state, cmd command) error{
 	}
 	fmt.Println("All users deleted")
 	return nil
+}
+
+func handleListUsers(s *state, cmd command) error{
+	users, err := s.db.GetUsers(context.Background())
+	if err != nil{
+		return err
+	}
+
+	current := s.cfg.CurrentUserName
+
+	for _, user := range users{
+		if user.Name == current{
+			fmt.Printf("* %s (current)\n", user.Name)
+		}else{
+			fmt.Printf("* %s\n", user.Name)
+		}
+	}
+
+	return nil
+}
+
+type RSSFeed struct {
+	Channel struct {
+		Title       string    `xml:"title"`
+		Link        string    `xml:"link"`
+		Description string    `xml:"description"`
+		Item        []RSSItem `xml:"item"`
+	} `xml:"channel"`
+}
+
+type RSSItem struct {
+	Title       string `xml:"title"`
+	Link        string `xml:"link"`
+	Description string `xml:"description"`
+	PubDate     string `xml:"pubDate"`
+}
+
+
+func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error){
+	client := &http.Client{}
+
+	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
+	if err != nil{
+		return nil, err
+	}
+	req.Header.Add("User-Agent", "gator")
+	resp, err := client.Do(req)
+	if err != nil{
+		return nil, err
+	}
+
+	data, err := io.ReadAll(resp.Body)
+	if err != nil{
+		return nil, err
+	}
+
+	rss := &RSSFeed{}
+	err = xml.Unmarshal(data, rss)
+	if err != nil{
+		return nil, err
+	}
+
+	return rss, nil
 }
