@@ -10,6 +10,7 @@ import(
 	"net/http"
 	"io"
 	"encoding/xml"
+	"html"
 )
 
 type state struct{
@@ -151,5 +152,22 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error){
 		return nil, err
 	}
 
+	rss.Channel.Title = html.UnescapeString(rss.Channel.Title)
+	rss.Channel.Description = html.UnescapeString(rss.Channel.Description)
+	for _, item := range rss.Channel.Item{
+		item.Title = html.UnescapeString(item.Title)
+		item.Description = html.UnescapeString(item.Description)
+	}
+
 	return rss, nil
+}
+
+func handleAggregate(s *state, cmd command) error{
+	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	if err != nil{
+		return err
+	}
+	fmt.Println("%v", feed)
+
+	return nil
 }
