@@ -198,3 +198,19 @@ func handleAddFeed(s *state, cmd command) error{
 	fmt.Println(feed)
 	return nil
 }
+
+
+func handleListFeeds(s *state, cmd command) error{
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil{
+		return err
+	}
+
+	for _, feed := range feeds{
+		fmt.Printf("Feed name: %s\n", feed.Name)
+		fmt.Printf("Feed URL: %s\n", feed.Url)
+		fmt.Printf("Created By: %s\n", feed.UserName)
+	}
+
+	return nil
+}
