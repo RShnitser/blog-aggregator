@@ -64,7 +64,7 @@ INNER JOIN users ON feeds.user_id=users.id
 type GetFeedsRow struct {
 	Name   string
 	Url    string
-	UserName string
+	Name_2 string
 }
 
 func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
@@ -76,7 +76,7 @@ func (q *Queries) GetFeeds(ctx context.Context) ([]GetFeedsRow, error) {
 	var items []GetFeedsRow
 	for rows.Next() {
 		var i GetFeedsRow
-		if err := rows.Scan(&i.Name, &i.Url, &i.UserName); err != nil {
+		if err := rows.Scan(&i.Name, &i.Url, &i.Name_2); err != nil {
 			return nil, err
 		}
 		items = append(items, i)
