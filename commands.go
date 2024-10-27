@@ -214,3 +214,16 @@ func handleListFeeds(s *state, cmd command) error{
 
 	return nil
 }
+
+func handleFollowFeed(s *state, cmd command) error{
+	if len(cmd.args) < 1{
+		return fmt.Errorf("url required")
+	}
+
+	feed, err := GetFeedFromUrl(context.Background(), cmd.args[0])
+	if err != nil{
+		return err
+	}
+	
+	return nil
+}

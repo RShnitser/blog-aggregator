@@ -12,7 +12,7 @@ import (
 	"github.com/google/uuid"
 )
 
-const createFeedFollows = `-- name: CreateFeedFollows :one
+const createFeedFollow = `-- name: CreateFeedFollow :one
 WITH inserted_feed_follow AS (
     INSERT INTO feed_follows (id, created_at, updated_at, user_id, feed_id)
     VALUES(
@@ -34,7 +34,7 @@ INNER JOIN users on inserted_feed_follow.user_id=users.id
 INNER JOIN feeds on inserted_feed_follow.feed_id=feeds.id
 `
 
-type CreateFeedFollowsParams struct {
+type CreateFeedFollowParams struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -42,7 +42,7 @@ type CreateFeedFollowsParams struct {
 	FeedID    uuid.UUID
 }
 
-type CreateFeedFollowsRow struct {
+type CreateFeedFollowRow struct {
 	ID        uuid.UUID
 	CreatedAt time.Time
 	UpdatedAt time.Time
@@ -52,15 +52,15 @@ type CreateFeedFollowsRow struct {
 	UserName  string
 }
 
-func (q *Queries) CreateFeedFollows(ctx context.Context, arg CreateFeedFollowsParams) (CreateFeedFollowsRow, error) {
-	row := q.db.QueryRowContext(ctx, createFeedFollows,
+func (q *Queries) CreateFeedFollow(ctx context.Context, arg CreateFeedFollowParams) (CreateFeedFollowRow, error) {
+	row := q.db.QueryRowContext(ctx, createFeedFollow,
 		arg.ID,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.UserID,
 		arg.FeedID,
 	)
-	var i CreateFeedFollowsRow
+	var i CreateFeedFollowRow
 	err := row.Scan(
 		&i.ID,
 		&i.CreatedAt,
