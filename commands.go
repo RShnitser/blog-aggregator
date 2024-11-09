@@ -246,3 +246,20 @@ func handleFollowFeed(s *state, cmd command) error{
 	fmt.Printf("User: %s\n", feed_follow.UserName)	
 	return nil
 }
+
+func handleListFollows(s *state, cmd command) error{
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil{
+		return err
+	}
+
+	feed_follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	if err != nil{
+		return err
+	}
+
+	for _ feed_follow := range feed_follows{
+		fmt.Printf("Feed: %s\n", feed_follow.FeedName)	
+	}
+
+}
