@@ -220,10 +220,29 @@ func handleFollowFeed(s *state, cmd command) error{
 		return fmt.Errorf("url required")
 	}
 
-	feed, err := GetFeedFromUrl(context.Background(), cmd.args[0])
+	feed, err := s.db.GetFeedFromUrl(context.Background(), cmd.args[0])
 	if err != nil{
 		return err
 	}
-	
+
+	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	if err != nil{
+		return err
+	}
+
+	feed_follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID: user.ID,
+		FeedID: feed.ID,
+	})
+
+	if err != nil{
+		return err
+	}
+
+	fmt.Printf("Feed: %s\n", feed_follow.FeedName)	
+	fmt.Printf("User: %s\n", feed_follow.UserName)	
 	return nil
 }
