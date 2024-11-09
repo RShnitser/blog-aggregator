@@ -172,15 +172,15 @@ func handleAggregate(s *state, cmd command) error{
 	return nil
 }
 
-func handleAddFeed(s *state, cmd command) error{
+func handleAddFeed(s *state, cmd command, user database.User) error{
 	if len(cmd.args) < 2{
 		return fmt.Errorf("feed name and url required")
 	}
 
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil{
-		return err
-	}
+	// user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	// if err != nil{
+	// 	return err
+	// }
 
 	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID: uuid.New(),
@@ -227,7 +227,7 @@ func handleListFeeds(s *state, cmd command) error{
 	return nil
 }
 
-func handleFollowFeed(s *state, cmd command) error{
+func handleFollowFeed(s *state, cmd command, user database.User) error{
 	if len(cmd.args) < 1{
 		return fmt.Errorf("url required")
 	}
@@ -237,10 +237,10 @@ func handleFollowFeed(s *state, cmd command) error{
 		return err
 	}
 
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil{
-		return err
-	}
+	// user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	// if err != nil{
+	// 	return err
+	// }
 
 	feed_follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		ID: uuid.New(),
@@ -259,11 +259,11 @@ func handleFollowFeed(s *state, cmd command) error{
 	return nil
 }
 
-func handleListFollows(s *state, cmd command) error{
-	user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	if err != nil{
-		return err
-	}
+func handleListFollows(s *state, cmd command, user database.User) error{
+	// user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
+	// if err != nil{
+	// 	return err
+	// }
 
 	feed_follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil{
