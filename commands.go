@@ -195,6 +195,18 @@ func handleAddFeed(s *state, cmd command) error{
 		return err
 	}
 
+	_, err = s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
+		ID: uuid.New(),
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID: user.ID,
+		FeedID: feed.ID,
+	})
+
+	if err != nil{
+		return err
+	}
+
 	fmt.Println(feed)
 	return nil
 }
@@ -258,8 +270,10 @@ func handleListFollows(s *state, cmd command) error{
 		return err
 	}
 
-	for _ feed_follow := range feed_follows{
+	for _, feed_follow := range feed_follows{
 		fmt.Printf("Feed: %s\n", feed_follow.FeedName)	
 	}
+
+	return nil
 
 }
