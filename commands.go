@@ -177,11 +177,6 @@ func handleAddFeed(s *state, cmd command, user database.User) error{
 		return fmt.Errorf("feed name and url required")
 	}
 
-	// user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	// if err != nil{
-	// 	return err
-	// }
-
 	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID: uuid.New(),
 		CreatedAt: time.Now(),
@@ -237,11 +232,6 @@ func handleFollowFeed(s *state, cmd command, user database.User) error{
 		return err
 	}
 
-	// user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	// if err != nil{
-	// 	return err
-	// }
-
 	feed_follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		ID: uuid.New(),
 		CreatedAt: time.Now(),
@@ -260,10 +250,6 @@ func handleFollowFeed(s *state, cmd command, user database.User) error{
 }
 
 func handleListFollows(s *state, cmd command, user database.User) error{
-	// user, err := s.db.GetUser(context.Background(), s.cfg.CurrentUserName)
-	// if err != nil{
-	// 	return err
-	// }
 
 	feed_follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil{
@@ -276,4 +262,18 @@ func handleListFollows(s *state, cmd command, user database.User) error{
 
 	return nil
 
+}
+
+func handleUnfollow(s *state, cmd command, user database.User) error{
+
+	if len(cmd.args) < 1{
+		return fmt.Errorf("url required")
+	}
+
+	err := s.db.DeleteFeedFollow(context.Background(), database.DeleteFeedFollowParams{UserID: user.ID, Url:cmd.args[0]})
+	if err != nil{
+		return err
+	}
+
+	return nil
 }
