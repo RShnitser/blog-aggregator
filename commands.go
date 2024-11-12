@@ -163,6 +163,12 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error){
 }
 
 func handleAggregate(s *state, cmd command) error{
+	if len(cmd.args) < 1{
+		return fmt.Errorf("time between requests required")
+	}
+
+	time_between_reqes := cmg.args[0]
+
 	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
 	if err != nil{
 		return err
