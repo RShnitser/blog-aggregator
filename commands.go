@@ -167,7 +167,7 @@ func handleAggregate(s *state, cmd command) error{
 		return fmt.Errorf("time between requests required")
 	}
 
-	time_between_reqes := cmg.args[0]
+	//time_between_reqes := cmd.args[0]
 
 	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
 	if err != nil{
@@ -281,5 +281,15 @@ func handleUnfollow(s *state, cmd command, user database.User) error{
 		return err
 	}
 
+	return nil
+}
+
+func scrapeFeeds(s *state) error{
+	feed, err := s.db.GetNextFeedToFetch(context.Background())
+	if err != nil{
+		return err
+	}
+
+	feed.LastFetchedAt.Time = time.Now()
 	return nil
 }
