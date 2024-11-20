@@ -11,6 +11,7 @@ import(
 	"io"
 	"encoding/xml"
 	"html"
+	"database/sql"
 )
 
 type state struct{
@@ -290,6 +291,8 @@ func scrapeFeeds(s *state) error{
 		return err
 	}
 
-	feed.LastFetchedAt.Time = time.Now()
+	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{ID:  feed.ID, LastFetchedAt: sql.NullTime{time.Now(), true}})
+
+	
 	return nil
 }
