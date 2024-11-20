@@ -291,7 +291,7 @@ func scrapeFeeds(s *state) error{
 		return err
 	}
 
-	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{ID:  feed.ID, LastFetchedAt: sql.NullTime{time.Now(), true}})
+	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{ID:  feed.ID, LastFetchedAt: sql.NullTime{time.Now(), true}, UpdatedAt: time.Now()})
 
 	
 	return nil
