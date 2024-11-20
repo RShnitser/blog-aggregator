@@ -168,13 +168,15 @@ func handleAggregate(s *state, cmd command) error{
 		return fmt.Errorf("time between requests required")
 	}
 
-	//time_between_reqes := cmd.args[0]
-
-	feed, err := fetchFeed(context.Background(), "https://www.wagslane.dev/index.xml")
+	rawTime := cmd.args[0]
+	timeBetweenRequests, err := time.ParseDuration(rawTime)
 	if err != nil{
 		return err
 	}
-	fmt.Println("%v", feed)
+	ticker := time.NewTicker(timeBetweenRequests)
+	for ; ; <-ticker.C {
+		scrapeFeeds(s)
+	}
 
 	return nil
 }
@@ -293,6 +295,11 @@ func scrapeFeeds(s *state) error{
 
 	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{ID:  feed.ID, LastFetchedAt: sql.NullTime{time.Now(), true}, UpdatedAt: time.Now()})
 
+	currFeed, err := fetchFeed(context.Background(), feed.Url)
+	if err != nil{
+		return err
+	}
+	fmt.Println("%v", currFeed)
 	
 	return nil
 }
