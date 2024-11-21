@@ -7,11 +7,6 @@ import(
 	"github.com/google/uuid"
 	"time"
 	"context"
-	"net/http"
-	"io"
-	"encoding/xml"
-	"html"
-	"database/sql"
 )
 
 type state struct{
@@ -112,124 +107,11 @@ func handleListUsers(s *state, cmd command) error{
 	return nil
 }
 
-type RSSFeed struct {
-	Channel struct {
-		Title       string    `xml:"title"`
-		Link        string    `xml:"link"`
-		Description string    `xml:"description"`
-		Item        []RSSItem `xml:"item"`
-	} `xml:"channel"`
-}
-
-type RSSItem struct {
-	Title       string `xml:"title"`
-	Link        string `xml:"link"`
-	Description string `xml:"description"`
-	PubDate     string `xml:"pubDate"`
-}
 
 
-func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error){
-	client := &http.Client{}
-
-	req, err := http.NewRequestWithContext(ctx, "GET", feedURL, nil)
-	if err != nil{
-		return nil, err
-	}
-	req.Header.Add("User-Agent", "gator")
-	resp, err := client.Do(req)
-	if err != nil{
-		return nil, err
-	}
-
-	data, err := io.ReadAll(resp.Body)
-	if err != nil{
-		return nil, err
-	}
-
-	rss := &RSSFeed{}
-	err = xml.Unmarshal(data, rss)
-	if err != nil{
-		return nil, err
-	}
-
-	rss.Channel.Title = html.UnescapeString(rss.Channel.Title)
-	rss.Channel.Description = html.UnescapeString(rss.Channel.Description)
-	for _, item := range rss.Channel.Item{
-		item.Title = html.UnescapeString(item.Title)
-		item.Description = html.UnescapeString(item.Description)
-	}
-
-	return rss, nil
-}
-
-func handleAggregate(s *state, cmd command) error{
-	if len(cmd.args) < 1{
-		return fmt.Errorf("time between requests required")
-	}
-
-	rawTime := cmd.args[0]
-	timeBetweenRequests, err := time.ParseDuration(rawTime)
-	if err != nil{
-		return err
-	}
-	ticker := time.NewTicker(timeBetweenRequests)
-	for ; ; <-ticker.C {
-		scrapeFeeds(s)
-	}
-
-	return nil
-}
-
-func handleAddFeed(s *state, cmd command, user database.User) error{
-	if len(cmd.args) < 2{
-		return fmt.Errorf("feed name and url required")
-	}
-
-	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
-		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Name: cmd.args[0],
-		Url: cmd.args[1],
-		UserID: user.ID,
-	})
-
-	if err != nil{
-		return err
-	}
-
-	_, err = s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
-		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		UserID: user.ID,
-		FeedID: feed.ID,
-	})
-
-	if err != nil{
-		return err
-	}
-
-	fmt.Println(feed)
-	return nil
-}
 
 
-func handleListFeeds(s *state, cmd command) error{
-	feeds, err := s.db.GetFeeds(context.Background())
-	if err != nil{
-		return err
-	}
 
-	for _, feed := range feeds{
-		fmt.Printf("Feed name: %s\n", feed.Name)
-		fmt.Printf("Feed URL: %s\n", feed.Url)
-		fmt.Printf("Created By: %s\n", feed.UserName)
-	}
-
-	return nil
-}
 
 func handleFollowFeed(s *state, cmd command, user database.User) error{
 	if len(cmd.args) < 1{
@@ -287,19 +169,3 @@ func handleUnfollow(s *state, cmd command, user database.User) error{
 	return nil
 }
 
-func scrapeFeeds(s *state) error{
-	feed, err := s.db.GetNextFeedToFetch(context.Background())
-	if err != nil{
-		return err
-	}
-
-	err = s.db.MarkFeedFetched(context.Background(), database.MarkFeedFetchedParams{ID:  feed.ID, LastFetchedAt: sql.NullTime{time.Now(), true}, UpdatedAt: time.Now()})
-
-	currFeed, err := fetchFeed(context.Background(), feed.Url)
-	if err != nil{
-		return err
-	}
-	fmt.Println("%v", currFeed)
-	
-	return nil
-}
