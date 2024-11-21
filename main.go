@@ -33,7 +33,7 @@ func main(){
 	commands.register("agg", handleAggregate)
 	commands.register("addfeed", middlewareLoggedIn(handleAddFeed))
 	commands.register("feeds", handleListFeeds)
-	commands.register("follow", middlewareLoggedIn(handleFollowFeed))
+	commands.register("follow", middlewareLoggedIn(handleFollow))
 	commands.register("following", middlewareLoggedIn(handleListFollows))
 	commands.register("unfollow", middlewareLoggedIn(handleUnfollow))
 
