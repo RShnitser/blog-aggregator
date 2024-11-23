@@ -20,8 +20,8 @@ func handleFollow(s *state, cmd command, user database.User) error{
 
 	feed_follow, err := s.db.CreateFeedFollow(context.Background(), database.CreateFeedFollowParams{
 		ID: uuid.New(),
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
 		UserID: user.ID,
 		FeedID: feed.ID,
 	})
@@ -37,13 +37,18 @@ func handleFollow(s *state, cmd command, user database.User) error{
 
 func handleListFollows(s *state, cmd command, user database.User) error{
 
-	feed_follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
+	feedFollows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil{
 		return err
 	}
 
-	for _, feed_follow := range feed_follows{
-		fmt.Printf("Feed: %s\n", feed_follow.FeedName)	
+	if len(feedFollows) == 0 {
+		fmt.Println("No feed follows found for this user.")
+		return nil
+	}
+
+	for _, feedFollow := range feedFollows{
+		fmt.Printf("Feed: %s\n", feedFollow.FeedName)	
 	}
 
 	return nil

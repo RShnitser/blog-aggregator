@@ -38,7 +38,9 @@ func scrapeFeeds(s *state) error{
 	if err != nil{
 		return err
 	}
-	fmt.Println("%v", currFeed)
+	for _, item := range currFeed.Channel.Item {
+		fmt.Printf("Found post: %s\n", item.Title)
+	}
 	
 	return nil
 }
