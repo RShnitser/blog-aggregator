@@ -11,3 +11,8 @@ VALUES (
     $8
 )
 RETURNING *;
+
+-- name: GetPosys :many
+SELECT * FROM posts
+ORDER BY created_at DESC
+LIMIT $1;
