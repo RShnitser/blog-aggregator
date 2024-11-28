@@ -6,6 +6,7 @@ import(
 	"time"
 	"context"
 	"database/sql"
+	"github.com/google/uuid"
 )
 
 func handleAggregate(s *state, cmd command) error{
@@ -39,7 +40,22 @@ func scrapeFeeds(s *state) error{
 		return err
 	}
 	for _, item := range currFeed.Channel.Item {
-		fmt.Printf("Found post: %s\n", item.Title)
+		//fmt.Printf("Found post: %s\n", item.Title)
+		const layout = ""
+		t, _ := time.Parse(layout, item.PubDate)
+		_, err := s.db.CreatePost(context.Background(), database.CreatePostParams{
+			ID: uuid.New(),
+			CreatedAt: time.Now().UTC(),
+			UpdatedAt: time.Now().UTC(),
+			Title: item.Title,
+			Url: item.Link,
+			Description: sql.NullString{item.Description, true},
+			PublishedAt: t,
+			FeedID: feed.ID,
+		})
+		if err != nil{
+			fmt.Println(err)
+		}
 	}
 	
 	return nil

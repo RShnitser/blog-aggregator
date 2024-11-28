@@ -12,7 +12,7 @@ VALUES (
 )
 RETURNING *;
 
--- name: GetPosys :many
+-- name: GetPosts :many
 SELECT * FROM posts
 ORDER BY created_at DESC
 LIMIT $1;
