@@ -6,7 +6,7 @@ import(
 	"fmt"
 )
 
-func handleBrowse(s *state, cmd command)error{
+func handleBrowse(s *state, cmd command, user database.User)error{
 	limit := 2
 
 	if len(cmd.args) == 1{
@@ -17,7 +17,8 @@ func handleBrowse(s *state, cmd command)error{
 		limit = newLimit
 	}
 
-	posts, err := s.db.GetPosts(context.Background(), int32(limit))
+	posts, err := s.db.GetPostsForUser(context.Background(), database.GetPostsForUserParams{ UserID: user.ID, Limit: int32(limit)})
+	
 	if err != nil{
 		return err
 	}
