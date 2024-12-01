@@ -2,6 +2,8 @@ package main
 
 import(
 	"strconv"
+	"context"
+	"fmt"
 )
 
 func handleBrowse(s *state, cmd command)error{
@@ -13,6 +15,15 @@ func handleBrowse(s *state, cmd command)error{
 			return err
 		}
 		limit = newLimit
+	}
+
+	posts, err := s.db.GetPosts(context.Background(), int32(limit))
+	if err != nil{
+		return err
+	}
+
+	for _, post := range posts{
+		fmt.Println(post.Title)
 	}
 
 	return nil
