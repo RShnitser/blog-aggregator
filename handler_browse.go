@@ -1,6 +1,7 @@
 package main
 
 import(
+	"blog-aggregator/internal/database"
 	"strconv"
 	"context"
 	"fmt"
